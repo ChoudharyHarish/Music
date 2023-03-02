@@ -1,32 +1,31 @@
-require('dotenv');
-const express = require('express')
-const bodyparser = require('body-parser');
+require('dotenv').config();
+const  express = require("express");
+const  bodyParser =  require("body-parser");
+const  cors =  require("cors");
+
+const connectDB  = require("./db/connect.js");
+// console.log(connectDB);
 const authRouter = require('./Routes/auth');
-const connect = require('./DB/connect');
 
 
 const app = express();
-app.use(bodyparser.urlencoded({extended:true}))
-app.use("/auth",authRouter);
+app.use(cors());
+app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }));
 
 
-app.get("/",(req,res) => {
-    res.send("Server is up and running");
-}) 
+app.get("/", (req, res) => res.send("Server Started"));
+app.use("/auth", authRouter);
 
 
-
-const startDB = async() => {
-    try{
-        connect('HarishChoudharyy:priya@9426@cluster0.dkxds89.mongodb.net/Music-app');
-        console.log("Server started to listen on port 5000");
-    }        
-    catch(error){
-        console.log(error.message);
+const port = 5000 || process.env.PORT;
+const start = async () => {
+    try {
+        await connectDB(process.env.MONGO_URL);
+        app.listen(port, () => console.log(`Server started to listen on port ${port}`));
     }
+    catch (error) {
+        console.log(error);
+    }
+
 }
-
-
-app.listen(5000, () => {
-    startDB();
-})
+start();
